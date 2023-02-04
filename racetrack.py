@@ -6,7 +6,7 @@ class Racetrack:
 
     def has_finished(self, position, velocity):
         # Check if the car has reached the finish line
-        pass
+        return True
 
     def check_for_crash(self, position, velocity):
         # Check if the car has crashed into a wall

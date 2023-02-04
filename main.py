@@ -7,7 +7,7 @@ if __name__ == '__main__':
     track = Racetrack()
 
     config = {
-        'episodes': 1e5,
+        'episodes': int(1e5),
         'epsilon': 0.1,     # probability of choosing random action
         'delta': 0.1,       # prob to not update velocity (not take action)
     }
