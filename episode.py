@@ -1,5 +1,6 @@
 from racetrack import Racetrack
 
+
 class Episode:
     def __init__(self, racetrack: Racetrack, epsilon, state_values):
         self.racetrack = racetrack

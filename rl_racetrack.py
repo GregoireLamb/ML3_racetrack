@@ -1,5 +1,6 @@
 from episode import Episode
 
+
 class RLRacetrack:
     def __init__(self, config, racetrack):
         self.racetrack = racetrack
