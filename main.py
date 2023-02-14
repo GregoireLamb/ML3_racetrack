@@ -4,6 +4,12 @@ from view import View
 
 
 if __name__ == '__main__':
+    track = Racetrack()
+    track.create_empty_grid((30, 30))
+    track.draw_grid_edges()
+
+    track.print()
+
     config = {
         'episodes': int(1e5),
         'epsilon': 0.1,                                 # probability of choosing random action
