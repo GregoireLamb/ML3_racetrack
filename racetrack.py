@@ -113,3 +113,10 @@ class Racetrack:
     def print(self):
         for x in self.grid:
             print(x, '\n')
+
+    # Methood to get the finish line
+    def get_finish_line(self):
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid[0])):
+                if self.grid[i][j] == 3:
+                    return (i, j)

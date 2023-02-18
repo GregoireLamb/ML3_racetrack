@@ -32,8 +32,8 @@ class RLRacetrack:
 
         possible_velocities = {(vx, vy) for vx in range(self.min_speed_x, self.max_speed_x + 1)
                                for vy in range(self.min_speed_y, self.max_speed_y + 1)}
-        possible_positions = {(x, y) for x in range(self.racetrack.size[0]) for y in
-                              range(self.racetrack.size[1])}
+        possible_positions = {(x, y) for x in range(len(self.racetrack.grid)) for y in
+                              range(len(self.racetrack.grid))}
 
         state_values = {(pos, vel): (-self.inf, 0) for pos in possible_positions for vel in possible_velocities}
 
