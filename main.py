@@ -27,5 +27,6 @@ if __name__ == '__main__':
     rl_racetrack.run()
     rl_racetrack.report()
 
-    visualization = View(config, rl_racetrack)
-    visualization.show()
+    #visualization = View(config, rl_racetrack)
+    #visualization.show()
+    #visualization.save()

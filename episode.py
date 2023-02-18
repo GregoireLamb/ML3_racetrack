@@ -39,7 +39,9 @@ class Episode:
         if vy == self.max_speed_y:
             deltas_vy.remove(1)
 
-        return [(delta_vx, delta_vy) for delta_vx in deltas_vx for delta_vy in deltas_vy]
+        possible_actions = [(delta_vx, delta_vy) for delta_vx in deltas_vx for delta_vy in deltas_vy if ((delta_vx + vx != 0) and (delta_vy + vy != 0))] # Car cannit stay in the same position
+        random.shuffle(possible_actions)
+        return possible_actions
 
     def choose_action(self, possible_actions):
         # Choose action based on epsilon-greedy policy. Return (position, speed, action)
