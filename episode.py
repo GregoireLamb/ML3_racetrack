@@ -26,8 +26,18 @@ class Episode:
         vx = self._current_velocity[0]
         vy = self._current_velocity[1]
 
-        deltas_vx = range(-vx - self.min_speed_x, -vx + self.max_speed_x + 1)
-        deltas_vy = range(-vy - self.min_speed_y, -vy + self.max_speed_y + 1)
+        deltas_vx = [-1, 0, 1]
+        deltas_vy = [-1, 0, 1]
+
+        if vx == self.min_speed_x:
+            deltas_vx.remove(-1)
+        if vx == self.max_speed_x:
+            deltas_vx.remove(1)
+
+        if vy == self.min_speed_y:
+            deltas_vy.remove(-1)
+        if vy == self.max_speed_y:
+            deltas_vy.remove(1)
 
         return [(delta_vx, delta_vy) for delta_vx in deltas_vx for delta_vy in deltas_vy]
 
@@ -48,7 +58,8 @@ class Episode:
     def go_back_to_start(self):
         # Go back to the start position
         print(f'--- Going back to start ---')
-        return random.choice(self.racetrack.start_positions), (0, 0)
+        y, x = random.choice(self.racetrack.start_positions)
+        return (x,y), (0, 0)
 
     def simulate(self):
         self._current_pos, self._current_velocity = self.go_back_to_start()
@@ -57,7 +68,7 @@ class Episode:
             possible_actions = self.get_possible_actions()
             self._current_pos, self._current_velocity, action = self.choose_action(possible_actions)
             print(self._current_pos, self._current_velocity, action)
-            self._path.append((self._current_pos, action))
+            self._path.append((self._current_pos, self._current_velocity, action))
             if self.racetrack.check_for_crash(self._current_pos, self._current_velocity):
                 self._current_pos, self._current_velocity = self.go_back_to_start()
 

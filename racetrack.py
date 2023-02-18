@@ -5,6 +5,7 @@ class Racetrack:
         # Values for the grid: 0 = outside, 1 = start, 2 = inside, 3 = finish
         self.grid = None
         self.max_height = None
+        self.start_positions = []
 
     def create_empty_grid(self, size):
         self.grid = [[0 for x in range(size[1])] for y in range(size[0])]
@@ -79,6 +80,7 @@ class Racetrack:
         self.right_walk(start_r)
         self.left_walk(start_l)
         for j in range(start_l, start_r+1):
+            self.start_positions.append((len(self.grid) - 1, j))
             self.grid[len(self.grid) - 1][j] = 1
 
         x_start_fill = start_l+1
@@ -103,12 +105,13 @@ class Racetrack:
 
     def check_for_crash(self, position, velocity):
         # check if the car will crash
-        x = position[1]
-        y = position[0]
-        if self.grid[y+velocity[0]][x+velocity[1]] == 0:
+        x = position[0]
+        y = position[1]
+        vx = velocity[0]
+        vy = velocity[1]
+        if (x + vx < 0) or (x + vx >= len(self.grid)) or (y + vy < 0) or (y + vy >= len(self.grid)) or (self.grid[y + vy][x + vx] == 0):
             return True
-        else:
-            return False
+        return False
 
     def print(self):
         for x in self.grid:

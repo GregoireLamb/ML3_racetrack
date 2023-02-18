@@ -51,7 +51,7 @@ class RLRacetrack:
     def update_state_values(self, path: List[Tuple[Tuple[int, int], Tuple[int, int], int]]):
         g = 0
         visited = set()
-        for (pos, vel), action in reversed(path):
+        for pos, vel, action in reversed(path):
             g += self.timestep_reward
             if self.update_state_values_rule == 'every_visit' or \
                     (self.update_state_values_rule == 'first_visit' and (pos, vel) not in visited):
@@ -68,9 +68,9 @@ class RLRacetrack:
         max_y = max([pos[1] for pos, _ in self.state_values.keys()])
         base_grid = [[0 for _ in range(max_x + 1)] for _ in range(max_y + 1)]
 
-        self.state_values_map(base_grid)
-        self.learnt_policy_path(base_grid)
-        self.convergence_curve()
+        #self.state_values_map(base_grid)
+        #self.learnt_policy_path(base_grid)
+        #self.convergence_curve()
 
     def state_values_map(self, base_grid: List[List[int]]):
         # Plot the state values map (project into position space)
