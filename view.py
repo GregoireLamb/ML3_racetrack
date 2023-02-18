@@ -8,6 +8,9 @@ class View:
         self.height = 800
         self.width = self.height*0.8
 
+    def set_path(self, path):
+        self.path = path
+
     def create_screen(self):
         screen = pygame.display.set_mode((self.height, self.width), pygame.RESIZABLE)
         screen.fill('white')
@@ -26,7 +29,7 @@ class View:
 
     def map_background(self):
         map_surf = pygame.Surface((self.width*3/4, self.width*3/4))
-        map_surf.fill('grey')
+        map_surf.fill('black')
         return map_surf
 
     def draw_path(self, map_surf, path, lim):
@@ -58,12 +61,12 @@ class View:
 
             pygame.draw.rect(map_surf, color, (key[0]*self.width*3/4/LENGHT, key[1]*self.width*3/4/LENGHT, self.width*3/4/LENGHT, self.width*3/4/LENGHT))
 
-        #for i in range(LENGHT):
-        #    vertical = (1 + i) * self.width * 3 / 4 / LENGHT
-        #    pygame.draw.line(map_surf, 'black', (vertical, 0), (vertical, self.width * 3 / 4), 1)
+        for i in range(LENGHT):
+            vertical = (1 + i) * self.width * 3 / 4 / LENGHT
+            pygame.draw.line(map_surf, 'black', (vertical, 0), (vertical, self.width * 3 / 4), 1)
 
-        #    horizontal = (1 + i) * self.width * 3 / 4 / LENGHT
-        #    pygame.draw.line(map_surf, 'black', (0, horizontal), (self.width * 3 / 4, horizontal), 1)
+            horizontal = (1 + i) * self.width * 3 / 4 / LENGHT
+            pygame.draw.line(map_surf, 'black', (0, horizontal), (self.width * 3 / 4, horizontal), 1)
 
 
 
@@ -77,17 +80,6 @@ class View:
         title = self.create_title()
         self.draw_grid(map_surf)
 
-        # ------
-        state1 = [(0, 0), (0, 0)]
-        state2 = [(1, 1), (1, 1)]
-        state3 = [(3, 3), (2, 2)]
-        state4 = [(5, 5), (2, 2)]
-        state5 = [(8, 6), (3, 1)]
-        state6 = [(12, 6), (4, 0)]
-
-        path = [state1, state2, state3, state4, state5, state6]
-        #-----
-
         run = 1
         step = 0
         while run:
@@ -99,16 +91,51 @@ class View:
             screen.blit(back_surf, (0, 0))  # Add surface
             screen.blit(map_surf, (self.height/25, self.width/8))  # Add surface
             screen.blit(title, (self.height/25, self.width/25))  # Add font
-            self.draw_path(map_surf, path, step)
+
+            pygame.time.delay(300)
+            self.draw_path(map_surf, self.path, step)
 
             step += 1
             pygame.time.delay(100)
             pygame.display.update()
 
+
         pygame.quit()
 
 
 if __name__ == '__main__':
+
+    state1 = [(15, 35), (0, 0)]
+    state2 = [(14, 34), (1, 1)]
+    state3 = [(12, 32), (2, 2)]
+    state4 = [(10, 30), (2, 2)]
+    state5 = [(9, 27), (3, 1)]
+    state6 = [(10, 23), (4, 1)]
+    state7 = [(11, 18), (5, 1)]
+    state8 = [(11, 13), (4, 0)]
+    state9 = [(11, 8), (5, 0)]
+    state10 = [(12, 3), (5, 1)]
+
+    path = [state1, state2, state3, state4, state5, state6, state7, state8, state9, state10]
+    path2 = [state1, state10]
+
     map = {(x, y): random.randint(0, 3) for x in range(0, 35) for y in range(0, 35)}
+
+    for x in range(0, 10):
+        for y in range(0, 35):
+            map[x, y] = 0
+        map[x, 1] = 0
+    for x in range(10, 22):
+        for y in range(0, 35):
+            map[x, y] = 2
+    for x in range(22, 35):
+        for y in range(0, 35):
+            map[x, y] = 0
+    for x in range(10, 22):
+        map[x, 34] = 1
+    for x in range(10, 22):
+        map[x, 0] = 3
+
     view = View(map)
+    view.set_path(path)
     view.show()
