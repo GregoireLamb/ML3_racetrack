@@ -10,25 +10,40 @@ class RLRacetrack:
     def __init__(self, config: dict, racetrack: Racetrack):
         self.racetrack = racetrack
         self.inf = 1e5
+
         self.n_episodes = config['episodes']
         self.epsilon = config['epsilon']
+        self.delta = config['delta']
         self.timestep_reward = config['timestep_reward']
         self.update_state_values_rule = config['update_state_values_rule']
+        self.max_speed_x = config['max_speed_x']
+        self.max_speed_y = config['max_speed_y']
+        self.min_speed_x = config['min_speed_x']
+        self.min_speed_y = config['min_speed_y']
+
         assert self.update_state_values_rule in ['first_visit', 'every_visit'], 'Invalid update state values rule'
-        self.state_values = self.define_state_values()      # (pos, vel) -> (estimated return, count)
         self.episode_returns = []
+
+        self.state_values = self.define_state_values() # (pos, vel) -> (estimated return, count)
 
     def define_state_values(self):
         # Define the state values for all possible states
         # (position, velocity) -> (estimated return, count)
-        # Set estimated return to -inf and count to 0
-        positions = set([pos for (pos, vel) in self.racetrack.grid.keys()])
-        state_values = {pos: (-self.inf, 0) for pos in positions}
+
+        possible_velocities = {(vx, vy) for vx in range(self.min_speed_x, self.max_speed_x + 1)
+                               for vy in range(self.min_speed_y, self.max_speed_y + 1)}
+        possible_positions = {(x, y) for x in range(self.racetrack.size[0]) for y in
+                              range(self.racetrack.size[1])}
+
+        state_values = {(pos, vel): (-self.inf, 0) for pos in possible_positions for vel in possible_velocities}
+
         return state_values
 
     def run(self):
         for episode in range(self.n_episodes):
-            ep = Episode(self.racetrack, self.epsilon, self.state_values)
+            print(f'Episode {episode + 1}/{self.n_episodes}')
+            ep = Episode(self.racetrack, self.epsilon, self.state_values,
+                         self.min_speed_x, self.max_speed_x, self.min_speed_y, self.max_speed_y, self.delta)
             path = ep.simulate()
             ep_return = self.update_state_values(path)
             self.episode_returns.append(ep_return)

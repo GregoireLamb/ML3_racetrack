@@ -15,10 +15,13 @@ if __name__ == '__main__':
         'epsilon': 0.1,                                 # probability of choosing random action
         'delta': 0.1,                                   # prob to not update velocity (not take action)
         'timestep_reward': -1,                          # reward for each timestep. Actually has no impact
-        'update_state_values_rule': 'every_visit'       # 'first_visit' or 'every_visit'
+        'update_state_values_rule': 'every_visit',      # 'first_visit' or 'every_visit'
+        'min_speed_x': 0,
+        'max_speed_x': 3,
+        'min_speed_y': 0,
+        'max_speed_y': 3
     }
 
-    track = Racetrack()
     rl_racetrack = RLRacetrack(config, track)
 
     rl_racetrack.run()
@@ -26,4 +29,3 @@ if __name__ == '__main__':
 
     visualization = View(config, rl_racetrack)
     visualization.show()
-
