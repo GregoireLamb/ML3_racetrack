@@ -4,6 +4,8 @@ from racetrack import Racetrack
 from typing import List, Tuple
 
 import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class RLRacetrack:
@@ -20,6 +22,8 @@ class RLRacetrack:
         self.max_speed_y = config['max_speed_y']
         self.min_speed_x = config['min_speed_x']
         self.min_speed_y = config['min_speed_y']
+
+        self.map_racetrack_values = {0: 'outside', 1: 'start', 2: 'inside', 3: 'finish'}
 
         assert self.update_state_values_rule in ['first_visit', 'every_visit'], 'Invalid update state values rule'
         self.episode_returns = []
@@ -64,34 +68,60 @@ class RLRacetrack:
         # 1. Plot the state values map (project into position space)
         # 2. Plot the convergence curve: return vs iteration
         # 3. Plot path following learnt policy (use follow_policy method)
-        max_x = max([pos[0] for pos, _ in self.state_values.keys()])
-        max_y = max([pos[1] for pos, _ in self.state_values.keys()])
-        base_grid = [[0 for _ in range(max_x + 1)] for _ in range(max_y + 1)]
+        base_grid = np.array(self.racetrack.grid).astype('float')
 
-        #self.state_values_map(base_grid)
-        #self.learnt_policy_path(base_grid)
-        #self.convergence_curve()
+        # self.state_values_map(base_grid, how='sum')
+        # self.state_values_map(base_grid, how='max')
+        self.learnt_policy_path(base_grid)
+        # self.convergence_curve()
 
-    def state_values_map(self, base_grid: List[List[int]]):
+    def state_values_map(self, base_grid: np.ndarray, how='sum'):
         # Plot the state values map (project into position space)
         # Use seaborn heatmap
         grid = base_grid.copy()
-        for pos, vel in self.state_values.keys():
-            grid[pos[1]][pos[0]] += self.state_values[pos, vel][0]      # Project into position space with sum
 
-        sns.heatmap(grid, annot=True, fmt=".1f").set(title='State values map')
+        cmap = {'outside': np.nan, 'start': np.nan, 'finish': np.nan}
+        for i in range(len(grid)):
+            for j in range(len(grid[i])):
+                grid[i][j] = cmap.get(self.map_racetrack_values[base_grid[i][j]], -self.inf)
+                if grid[i][j] < 0:
+                    proj_func = max if how == 'max' else sum
+                    state_values = [self.state_values[(i, j), (vx, vy)][0] for vx in
+                                    range(self.min_speed_x, self.max_speed_x + 1)
+                                    for vy in range(self.min_speed_y, self.max_speed_y + 1)]
+
+                    grid[i][j] = proj_func(state_values)
+
+        sns.heatmap(grid, annot=False, fmt=".1f").set(title=f'State values map - {how} projection')
+        plt.show()
 
     def convergence_curve(self):
         # Plot the convergence curve: return vs iteration
-        sns.lineplot(x=range(self.n_episodes), y=self.episode_returns).\
-            set(xlabel='Episode', ylabel='Return').set(title='Convergence curve')
+        # For smoothing purposes, we actually plot return vs 100-episode moving average of returns
+        smoothing_ma_window = 100
+        moving_average = []
+        for i in range(len(self.episode_returns)):
+            moving_average.append(np.mean(self.episode_returns[max(0, i - smoothing_ma_window):i + 1]))
 
-    def learnt_policy_path(self, base_grid: List[List[int]]):
-        # Plot path following learnt policy (use follow_policy method)
+        sns.lineplot(x=range(self.n_episodes), y=moving_average).\
+            set(xlabel='Episode', ylabel='Return', title=f'Convergence curve (MA = {smoothing_ma_window})')
+        plt.show()
+
+    def learnt_policy_path(self, base_grid: np.ndarray):
+        # Plot path following learnt policy
         # Run the policy and print the path
-        ep = Episode(self.racetrack, epsilon=0, state_values=self.state_values)
+        ep = Episode(self.racetrack, 0, self.state_values, self.min_speed_x, self.max_speed_x, self.min_speed_y,
+                     self.max_speed_y, self.delta)
         path = ep.simulate()
+
         grid = base_grid.copy()
-        for pos, vel in path:
+        cmap = {'outside': np.nan, 'start': self.inf, 'finish': self.inf, 'inside': -self.inf}
+
+        for i in range(len(grid)):
+            for j in range(len(grid[i])):
+                grid[i][j] = cmap[self.map_racetrack_values[base_grid[i][j]]]
+
+        for pos, _, _ in path:
             grid[pos[1]][pos[0]] = 1
-        sns.heatmap(grid, annot=True, fmt=".1f").set(title='Path following learnt policy')
+        sns.heatmap(grid, annot=False, fmt=".1f").set(title='Path following learnt policy')
+        plt.show()
