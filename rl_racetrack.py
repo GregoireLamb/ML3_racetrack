@@ -6,6 +6,7 @@ from typing import List, Tuple
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 
 class RLRacetrack:
@@ -28,8 +29,9 @@ class RLRacetrack:
 
         assert self.update_state_values_rule in ['first_visit', 'every_visit'], 'Invalid update state values rule'
         self.episode_returns = []
+        self.start_time = time.time()
 
-        self.state_values = self.define_state_values() # (pos, vel) -> (estimated return, count)
+        self.state_values = self.define_state_values()  # (pos, vel) -> (estimated return, count)
 
     def define_state_values(self):
         # Define the state values for all possible states
@@ -45,8 +47,12 @@ class RLRacetrack:
         return state_values
 
     def run(self):
+        print('Running episode simulations...')
         for episode in range(self.n_episodes):
-            print(f'Episode {episode + 1}/{self.n_episodes}')
+            # print progress in percents.
+            if episode % (self.n_episodes // 10) == 0:
+                print(f'{episode // (self.n_episodes // 10) * 10}%')
+
             ep = Episode(self.racetrack, self.epsilon, self.state_values,
                          self.min_speed_x, self.max_speed_x, self.min_speed_y, self.max_speed_y, self.delta,
                          self.max_episode_length)
@@ -70,12 +76,21 @@ class RLRacetrack:
         # 1. Plot the state values map (project into position space)
         # 2. Plot the convergence curve: return vs iteration
         # 3. Plot path following learnt policy (use follow_policy method)
-        base_grid = np.array(self.racetrack.grid).astype('float')
+        self.print_stats()
 
+        base_grid = np.array(self.racetrack.grid).astype('float')
         self.state_values_map(base_grid, how='sum')
         self.state_values_map(base_grid, how='max')
         self.learnt_policy_path(base_grid)
         self.convergence_curve()
+
+    def print_stats(self):
+        print('\n-- Execution stats --')
+        print('Number of episodes:', self.n_episodes)
+        print('Average return:', np.mean(self.episode_returns))
+        print('Last 100 episodes average return:',
+              np.mean(self.episode_returns[-100:] if len(self.episode_returns) >= 100 else 'N/A'))
+        print('Total runtime:', round(time.time() - self.start_time, 2), 'seconds')
 
     def state_values_map(self, base_grid: np.ndarray, how='sum'):
         # Plot the state values map (project into position space)
@@ -105,7 +120,7 @@ class RLRacetrack:
         for i in range(len(self.episode_returns)):
             moving_average.append(np.mean(self.episode_returns[max(0, i - smoothing_ma_window):i + 1]))
 
-        sns.lineplot(x=range(self.n_episodes), y=moving_average).\
+        sns.lineplot(x=range(self.n_episodes), y=moving_average). \
             set(xlabel='Episode', ylabel='Return', title=f'Convergence curve (MA = {smoothing_ma_window})')
         plt.show()
 
