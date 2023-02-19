@@ -6,6 +6,7 @@ class Racetrack:
         self.grid = None
         self.max_height = None
         self.start_positions = []
+        self.max_x = None
 
     def create_empty_grid(self, size):
         self.grid = [[0 for x in range(size[1])] for y in range(size[0])]
@@ -19,6 +20,7 @@ class Racetrack:
         self.grid[n - 2][x] = 2
         # force to go U on the first step
         y = n - 2
+        self.max_x = x - min_width - 1
 
         while x < m - min_width - 1:
             # leave space to account for velocity at finish line
@@ -96,9 +98,12 @@ class Racetrack:
 
     def has_finished(self, position, velocity):
         # check if the car has reached the finish line
-        x = position[1]
-        y = position[0]
-        if self.grid[y][x] == 3:
+        x = position[0]
+        y = position[1]
+        vx = velocity[0]
+        vy = velocity[1]
+
+        if x + vx >= self.max_x:
             return True
         else:
             return False
