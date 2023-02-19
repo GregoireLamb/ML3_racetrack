@@ -153,12 +153,7 @@ class Racetrack:
                 (self.grid[y + vy][x + vx] == 0)
 
     def print(self):
-        for x in self.grid:
-            print(x, '\n')
-
-    # Method to get the finish line
-    def get_finish_line(self):
+        values_map = {0: u"█", 1: "X", 2: " ", 3: "X"}
         for i in range(len(self.grid)):
-            for j in range(len(self.grid[0])):
-                if self.grid[i][j] == 3:
-                    return (i, j)
+            print(''.join([values_map[self.grid[i][j]] for j in range(len(self.grid[i]))]))
+
