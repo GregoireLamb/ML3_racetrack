@@ -6,7 +6,7 @@ from view import View
 if __name__ == '__main__':
     config = {
         'grid_shape': (30, 30),
-        'episodes': int(1e4),
+        'episodes': int(1e3),
         'epsilon': 0.1,                                 # probability of choosing random action
         'delta': 0.1,                                   # prob to not update velocity (not take action)
         'timestep_reward': -1,                          # reward for each timestep. Actually has no impact
