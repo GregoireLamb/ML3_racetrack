@@ -22,6 +22,7 @@ class RLRacetrack:
         self.max_speed_y = config['max_speed_y']
         self.min_speed_x = config['min_speed_x']
         self.min_speed_y = config['min_speed_y']
+        self.max_episode_length = config['max_episode_length']
 
         self.map_racetrack_values = {0: 'outside', 1: 'start', 2: 'inside', 3: 'finish'}
 
@@ -47,7 +48,8 @@ class RLRacetrack:
         for episode in range(self.n_episodes):
             print(f'Episode {episode + 1}/{self.n_episodes}')
             ep = Episode(self.racetrack, self.epsilon, self.state_values,
-                         self.min_speed_x, self.max_speed_x, self.min_speed_y, self.max_speed_y, self.delta)
+                         self.min_speed_x, self.max_speed_x, self.min_speed_y, self.max_speed_y, self.delta,
+                         self.max_episode_length)
             path = ep.simulate()
             ep_return = self.update_state_values(path)
             self.episode_returns.append(ep_return)
@@ -70,10 +72,10 @@ class RLRacetrack:
         # 3. Plot path following learnt policy (use follow_policy method)
         base_grid = np.array(self.racetrack.grid).astype('float')
 
-        # self.state_values_map(base_grid, how='sum')
-        # self.state_values_map(base_grid, how='max')
+        self.state_values_map(base_grid, how='sum')
+        self.state_values_map(base_grid, how='max')
         self.learnt_policy_path(base_grid)
-        # self.convergence_curve()
+        self.convergence_curve()
 
     def state_values_map(self, base_grid: np.ndarray, how='sum'):
         # Plot the state values map (project into position space)
@@ -111,7 +113,7 @@ class RLRacetrack:
         # Plot path following learnt policy
         # Run the policy and print the path
         ep = Episode(self.racetrack, 0, self.state_values, self.min_speed_x, self.max_speed_x, self.min_speed_y,
-                     self.max_speed_y, self.delta)
+                     self.max_speed_y, self.delta, self.max_episode_length)
         path = ep.simulate()
 
         grid = base_grid.copy()
