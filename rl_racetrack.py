@@ -39,12 +39,16 @@ class RLRacetrack:
 
         return state_values
 
-    def run(self):
+    def run(self, filename):
+        # create log file
+        f = open(filename, 'w')
+
         for episode in range(self.n_episodes):
-            print(f'Episode {episode + 1}/{self.n_episodes}')
+            f.write(f'Episode {episode + 1}\n')
+            #print(f'Episode {episode + 1}/{self.n_episodes}')
             ep = Episode(self.racetrack, self.epsilon, self.state_values,
                          self.min_speed_x, self.max_speed_x, self.min_speed_y, self.max_speed_y, self.delta)
-            path = ep.simulate()
+            path = ep.simulate(f)
             ep_return = self.update_state_values(path)
             self.episode_returns.append(ep_return)
 

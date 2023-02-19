@@ -1,4 +1,5 @@
 import random
+import datetime
 
 class Racetrack:
     def __init__(self):  # size = (rows, columns)
@@ -112,6 +113,19 @@ class Racetrack:
         if (x + vx < 0) or (x + vx >= len(self.grid)) or (y + vy < 0) or (y + vy >= len(self.grid)) or (self.grid[y + vy][x + vx] == 0):
             return True
         return False
+
+    def store_grid(self):
+        # get the current time to name the file
+        time = datetime.datetime.now()
+        filename = 'grid_'+str(time).replace('-','_').split('.', 1)[0].replace(':', '_').replace(' ', 'h')+'.txt'
+        # store the grid in a file
+        with open('runs/'+filename, 'w') as f:
+            for x in self.grid:
+                for y in x:
+                    if y != '[' or y != ']':
+                        f.write(str(y)+',')
+                f.write('\n')
+        return filename
 
     def print(self):
         for x in self.grid:
