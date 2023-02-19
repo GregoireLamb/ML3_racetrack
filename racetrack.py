@@ -1,14 +1,21 @@
 import random
 
+
 class Racetrack:
-    def __init__(self):  # size = (rows, columns)
+    def __init__(self, config):  # size = (rows, columns)
         # Values for the grid: 0 = outside, 1 = start, 2 = inside, 3 = finish
+        self.shape = config['grid_shape']
+
         self.grid = None
         self.max_height = None
         self.start_positions = []
 
-    def create_empty_grid(self, size):
-        self.grid = [[0 for x in range(size[1])] for y in range(size[0])]
+    def create_grid(self):
+        self.create_empty_grid()
+        self.draw_grid_edges()
+
+    def create_empty_grid(self):
+        self.grid = [[0 for x in range(self.shape[1])] for y in range(self.shape[0])]
         # initialize an empty nxm grid
 
     def right_walk(self, x_start, min_space=5, min_width=5):
@@ -93,11 +100,10 @@ class Racetrack:
             self.fill_grid(y, x + 1)
             self.fill_grid(y - 1, x)
 
-
     def has_finished(self, position, velocity):
         # check if the car has reached the finish line
-        x = position[1]
-        y = position[0]
+        x = position[0]
+        y = position[1]
         if self.grid[y][x] == 3:
             return True
         else:

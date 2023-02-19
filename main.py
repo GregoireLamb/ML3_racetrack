@@ -4,14 +4,9 @@ from view import View
 
 
 if __name__ == '__main__':
-    track = Racetrack()
-    track.create_empty_grid((30, 30))
-    track.draw_grid_edges()
-
-    track.print()
-
     config = {
-        'episodes': 1000,#int(1e5),
+        'grid_shape': (30, 30),
+        'episodes': int(1e4),                               # int(1e5)
         'epsilon': 0.1,                                 # probability of choosing random action
         'delta': 0.1,                                   # prob to not update velocity (not take action)
         'timestep_reward': -1,                          # reward for each timestep. Actually has no impact
@@ -21,6 +16,10 @@ if __name__ == '__main__':
         'min_speed_y': -5,
         'max_speed_y': 0
     }
+    track = Racetrack(config)
+    track.create_grid()
+
+    track.print()
 
     rl_racetrack = RLRacetrack(config, track)
 
