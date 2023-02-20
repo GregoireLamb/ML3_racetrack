@@ -10,7 +10,7 @@ if __name__ == '__main__':
         'epsilon': 0.1,                                 # probability of choosing random action
         'delta': 0.1,                                   # prob to not update velocity (not take action)
         'timestep_reward': -1,                          # reward for each timestep. Actually has no impact
-        'update_state_values_rule': 'every_visit',      # 'first_visit' or 'every_visit'
+        'update_state_values_rule': 'last_visit',      # 'first_visit', 'every_visit', 'last_visit'
         'min_speed_x': 0,
         'max_speed_x': 5,
         'min_speed_y': -5,
@@ -25,8 +25,8 @@ if __name__ == '__main__':
 
     rl_racetrack = RLRacetrack(config, track)
 
-    logs = 'runs_'+grid_file.lstrip('grid_')
-    rl_racetrack.run('runs/'+logs)
+    logs = 'runs_' + grid_file.lstrip('grid_')
+    rl_racetrack.run('runs/' + logs)
     rl_racetrack.report()
 
     #visualization = View()

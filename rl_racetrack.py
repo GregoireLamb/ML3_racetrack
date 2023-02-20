@@ -27,7 +27,8 @@ class RLRacetrack:
 
         self.map_racetrack_values = {0: 'outside', 1: 'start', 2: 'inside', 3: 'finish'}
 
-        assert self.update_state_values_rule in ['first_visit', 'every_visit'], 'Invalid update state values rule'
+        assert self.update_state_values_rule in ['first_visit', 'every_visit', 'last_visit'], \
+            'Invalid update state values rule'
         self.episode_returns = []
         self.start_time = time.time()
 
@@ -59,20 +60,29 @@ class RLRacetrack:
             ep = Episode(self.racetrack, self.epsilon, self.state_values,
                          self.min_speed_x, self.max_speed_x, self.min_speed_y, self.max_speed_y, self.delta,
                          self.max_episode_length)
-            path = ep.simulate(f)
-            ep_return = self.update_state_values(path)
+            path, reached_end = ep.simulate(f)
+            ep_return = self.update_state_values(path) if reached_end else - self.inf
             self.episode_returns.append(ep_return)
 
     def update_state_values(self, path: List[Tuple[Tuple[int, int], Tuple[int, int], int]]):
         g = 0
         visited = set()
-        for pos, vel, action in reversed(path):
-            g += self.timestep_reward
-            if self.update_state_values_rule == 'every_visit' or \
-                    (self.update_state_values_rule == 'first_visit' and (pos, vel) not in visited):
-                estimated_return, count = self.state_values[pos, vel]
-                self.state_values[pos, vel] = (estimated_return + g) / (count + 1), count + 1
-                visited.add((pos, vel))
+        if self.update_state_values_rule == 'last_visit':
+            for pos, vel, action in path:
+                g += self.timestep_reward
+                if (pos, vel) not in visited:
+                    estimated_return, count = self.state_values[pos, vel]
+                    self.state_values[pos, vel] = (estimated_return + g) / (count + 1), count + 1
+                    visited.add((pos, vel))
+
+        else:
+            for pos, vel, action in reversed(path):
+                g += self.timestep_reward
+                if self.update_state_values_rule == 'every_visit' or \
+                        (self.update_state_values_rule == 'first_visit' and (pos, vel) not in visited):
+                    estimated_return, count = self.state_values[pos, vel]
+                    self.state_values[pos, vel] = (estimated_return + g) / (count + 1), count + 1
+                    visited.add((pos, vel))
         return g
 
     def report(self):
