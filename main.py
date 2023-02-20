@@ -5,7 +5,6 @@ import yaml
 
 if __name__ == '__main__':
     # Read config.yaml file
-
     config = yaml.load(open('config.yaml', 'r'), Loader=yaml.FullLoader)
 
     track = Racetrack(config)

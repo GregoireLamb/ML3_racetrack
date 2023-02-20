@@ -7,7 +7,7 @@ import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-
+from utils import mov_avg
 
 class RLRacetrack:
     def __init__(self, config: dict, racetrack: Racetrack):
@@ -131,11 +131,7 @@ class RLRacetrack:
         # Plot the convergence curve: return vs iteration
         # For smoothing purposes, we actually plot return vs 100-episode moving average of returns
         smoothing_ma_window = 100
-        moving_average = np.convolve(np.array(self.episode_returns),
-                                     np.ones(smoothing_ma_window) / smoothing_ma_window,
-                                     mode='valid')
-        moving_average = np.concatenate((np.mean(self.episode_returns[:smoothing_ma_window - 1]) * np.ones(
-            smoothing_ma_window - 1), moving_average))
+        moving_average = mov_avg(self.episode_returns, smoothing_ma_window)
         sns.lineplot(x=range(self.n_episodes), y=moving_average). \
             set(xlabel='Episode', ylabel='Return', title=f'Convergence curve (MA = {smoothing_ma_window})')
         plt.show()

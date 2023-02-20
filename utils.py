@@ -1,4 +1,7 @@
-def side(a,b,c):
+import numpy as np
+
+
+def side(a, b, c):
     """ Returns a position of the point c relative to the line going through a and b
         Points a, b are expected to be different
     """
@@ -51,3 +54,10 @@ def closed_segment_intersect(a, b, c, d):
         return False
 
     return True
+
+
+def mov_avg(x, window):
+    # Convert to numpy array
+    x = np.array(x)
+    ans = np.convolve(x, np.ones(window) / window, mode='valid')
+    return np.concatenate((np.mean(x[:window - 1]) * np.ones(window - 1), ans)).tolist()
