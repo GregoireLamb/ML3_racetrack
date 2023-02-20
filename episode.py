@@ -73,15 +73,15 @@ class Episode:
             f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
         while not self.racetrack.has_finished_new(self._current_pos, self._current_velocity) and \
                 duration < self.max_episode_length:
-            possible_actions = self.get_possible_actions()
-            self._current_pos, self._current_velocity, action = self.choose_action(possible_actions)
-            file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
-            self._path.append((self._current_pos, self._current_velocity, action))
             if self.racetrack.check_for_crash(self._current_pos, self._current_velocity):
                 file.write(
                     f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
                 self._current_pos, self._current_velocity = self.go_to_start()
                 file.write(
                     f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
+            possible_actions = self.get_possible_actions()
+            self._current_pos, self._current_velocity, action = self.choose_action(possible_actions)
+            file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
+            self._path.append((self._current_pos, self._current_velocity, action))
             duration += 1
         return self._path
