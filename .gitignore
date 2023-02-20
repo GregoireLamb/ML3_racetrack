@@ -2,3 +2,4 @@
 *.txt
 _pycache_/
 *.pyc
+*.yaml

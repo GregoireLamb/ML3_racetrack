@@ -1,23 +1,13 @@
 from racetrack import Racetrack
 from rl_racetrack import RLRacetrack
 from view import View
-
+import yaml
 
 if __name__ == '__main__':
-    config = {
-        'grid_shape': (30, 30),
-        'episodes': 2 * int(1e4),
-        'epsilon': 0.3,                                 # probability of choosing random action
-        'delta': 0,                                   # prob to not update velocity (not take action)
-        'timestep_reward': -1,                          # reward for each timestep. Actually has no impact
-        'update_state_values_rule': 'last_visit',      # 'first_visit', 'every_visit', 'last_visit'
-        'min_speed_x': 0,
-        'max_speed_x': 5,
-        'min_speed_y': -5,
-        'max_speed_y': 0,
-        'max_episode_length': 1e4,
-        'seed': 754,                                   #  754 # other ok seeds 171#55#51 #754 47585
-    }
+    # Read config.yaml file
+
+    config = yaml.load(open('config.yaml', 'r'), Loader=yaml.FullLoader)
+
     track = Racetrack(config)
     grid_file = track.create_grid()
 
