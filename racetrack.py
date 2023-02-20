@@ -175,12 +175,9 @@ class Racetrack:
 
     def check_for_crash(self, position, velocity):
         # check if the car will crash
-        x = position[0]
-        y = position[1]
-        vx = velocity[0]
-        vy = velocity[1]
-        return (x + vx < 0) or (x + vx >= len(self.grid)) or (y + vy < 0) or (y + vy >= len(self.grid)) or \
-                (self.grid[y + vy][x + vx] == 0)
+        x, y = position
+        vx, vy = velocity
+        return self.grid[y][x] == 0
 
     def store_grid(self):
         # get the current time to name the file

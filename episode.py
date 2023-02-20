@@ -81,7 +81,7 @@ class Episode:
                     f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
             possible_actions = self.get_possible_actions()
             self._current_pos, self._current_velocity, action = self.choose_action(possible_actions)
-            file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
             self._path.append((self._current_pos, self._current_velocity, action))
+            file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
             duration += 1
-        return self._path, duration == self.max_episode_length
+        return self._path, duration < self.max_episode_length
