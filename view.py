@@ -61,6 +61,11 @@ class View:
         pygame.display.set_caption('ML3 Racetrack')
         return screen
 
+    def create_info_surface(self):
+        info_font = pygame.font.Font(None, 20)
+        info_surf = info_font.render('INFO ', True, 'Black')
+        return info_surf
+
     def create_title(self):
         title_font = pygame.font.Font(None, 50)
         title_surface = title_font.render('ML3: Racetrack group 31', True, 'Black')
@@ -81,6 +86,12 @@ class View:
             pygame.draw.line(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), (path[i+1][0][0]*self.width*3/4/self.map_height, path[i+1][0][1]*self.width*3/4/self.map_height), 3)
             #pygame.draw.circle(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), 5)
 
+    def update_info(self, episode):
+        info_font = pygame.font.Font(None, 20)
+        text = 'Episode: ' + str(episode)
+        info_surf = info_font.render(text, True, 'Black')
+        return info_surf
+
     def draw_episodes(self, map_surf, lim):
         episode = 0
         total_frames = len(self.episodes[episode])-1
@@ -99,6 +110,7 @@ class View:
 
         print('Episode: ', episode, 'Frame: ', n_frames)
         self.draw_path(map_surf, path, n_frames)
+        return episode
 
 
     def draw_grid(self, map_surf):
@@ -135,6 +147,7 @@ class View:
         back_surf = self.create_background()
         map_surf = self.map_background()
         title = self.create_title()
+        info_surf = self.create_info_surface()
         self.draw_grid(map_surf)
 
         run = 1
@@ -149,9 +162,11 @@ class View:
             screen.blit(back_surf, (0, 0))  # Add surface
             screen.blit(map_surf, (self.height/25, self.width/8))  # Add surface
             screen.blit(title, (self.height/25, self.width/25))  # Add font
+            screen.blit(info_surf, (self.height/1.5, self.width/5))  # Add surface
 
             self.draw_grid(map_surf)
-            self.draw_episodes(map_surf, step)
+            episode = self.draw_episodes(map_surf, step)
+            info_surf = self.update_info(episode)
 
             step += 1
             pygame.display.update()
@@ -161,8 +176,10 @@ class View:
         pygame.quit()
 
 
+
+
 if __name__ == '__main__':
     visualization = View()
-    visualization.load_map('runs/grid_2023_02_20h11_46_22.txt')
+    visualization.load_map('runs/grid_2023_02_20h13_15_24.txt')
     visualization.load_path('runs/policy_path.txt')
     visualization.show()
