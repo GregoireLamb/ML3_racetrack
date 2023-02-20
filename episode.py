@@ -84,4 +84,4 @@ class Episode:
             file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
             self._path.append((self._current_pos, self._current_velocity, action))
             duration += 1
-        return self._path
+        return self._path, duration == self.max_episode_length
