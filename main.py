@@ -6,7 +6,7 @@ from view import View
 if __name__ == '__main__':
     config = {
         'grid_shape': (30, 30),
-        'episodes': int(1e3),
+        'episodes': int(1e4),
         'epsilon': 0.1,                                 # probability of choosing random action
         'delta': 0.1,                                   # prob to not update velocity (not take action)
         'timestep_reward': -1,                          # reward for each timestep. Actually has no impact
@@ -15,7 +15,7 @@ if __name__ == '__main__':
         'max_speed_x': 5,
         'min_speed_y': -5,
         'max_speed_y': 0,
-        'max_episode_length': 1000,
+        'max_episode_length': 1e3,
     }
     track = Racetrack(config)
     track.create_grid()

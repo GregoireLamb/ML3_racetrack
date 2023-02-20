@@ -1,5 +1,5 @@
 import random
-
+from utils import closed_segment_intersect
 
 class Racetrack:
     def __init__(self, config):
@@ -9,11 +9,20 @@ class Racetrack:
         self.grid = None
         self.max_height = None
         self.start_positions = []
+        self.end_positions = []
+        self.finish_line_endpoints = None
         self.max_x = None
 
     def create_grid(self):
         self.create_empty_grid()
         self.draw_grid_edges()
+        self.compute_finish_line_endpoints()
+
+    def compute_finish_line_endpoints(self):
+        max_y = max([y for x, y in self.end_positions])
+        min_y = min([y for x, y in self.end_positions])
+        x = self.end_positions[0][0]
+        self.finish_line_endpoints = (x, min_y), (x, max_y)
 
     def create_empty_grid(self):
         self.grid = [[0 for x in range(self.shape[1])] for y in range(self.shape[0])]
@@ -43,6 +52,7 @@ class Racetrack:
                 else:
                     x += 1
         self.grid[y][x] = 3
+        self.end_positions.append((x, y))
         # we stop at the finish line
         self.max_height = y
 
@@ -78,10 +88,12 @@ class Racetrack:
                 else:
                     x += 1
         self.grid[y][x] = 3
+        self.end_positions.append((x, y))
 
+        # paint the finish line
         for i in range(y, self.max_height):
             self.grid[i][m - min_width - 1] = 3
-            # paint the finish line
+            self.end_positions.append((m - min_width - 1, i))
 
     def draw_grid_edges(self, min_space=5, min_width=5):
         start_r = (min_space + min_width * 2 - 1)
@@ -102,12 +114,23 @@ class Racetrack:
             self.fill_grid(y, x + 1)
             self.fill_grid(y - 1, x)
 
+    def has_finished_new(self, position, velocity):
+        # Compute whether the segments:
+        # 1. previous position to current position, and
+        # 2. finish line; are intersecting
+        # If they are, then the car has finished
+        x, y = position
+        vx, vy = velocity
+        x_prev = x - vx
+        y_prev = y - vy
+        return closed_segment_intersect((x_prev, y_prev), (x, y), *self.finish_line_endpoints)
+
     def has_finished(self, position, velocity):
         # check if the car has reached the finish line
         x, y = position
         vx, vy = velocity
 
-        assert self.grid[y][x] == 2, "the has_finished method cannot be used outside the road"
+        # assert self.grid[y][x] != 0, "the has_finished method cannot be used outside the road"
 
         dist_to_finish = abs(self.max_x - x)
 

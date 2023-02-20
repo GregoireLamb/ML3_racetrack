@@ -62,18 +62,18 @@ class Episode:
 
     def go_to_start(self):
         # Go back to the start position
-        # print(f'--- Going back to start ---')
+        print(f'--- Going back to start ---')
         y, x = random.choice(self.racetrack.start_positions)
-        return (x,y), (0, 0)
+        return (x, y), (0, 0)
 
     def simulate(self):
         self._current_pos, self._current_velocity = self.go_to_start()
         duration = 0
-        while not self.racetrack.has_finished(self._current_pos, self._current_velocity) and \
+        while not self.racetrack.has_finished_new(self._current_pos, self._current_velocity) and \
                 duration < self.max_episode_length:
             possible_actions = self.get_possible_actions()
             self._current_pos, self._current_velocity, action = self.choose_action(possible_actions)
-            # print(self._current_pos, self._current_velocity, action)
+            print(self._current_pos, self._current_velocity, action)
             self._path.append((self._current_pos, self._current_velocity, action))
             if self.racetrack.check_for_crash(self._current_pos, self._current_velocity):
                 self._current_pos, self._current_velocity = self.go_to_start()
