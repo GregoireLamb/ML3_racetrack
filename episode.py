@@ -24,8 +24,7 @@ class Episode:
     def get_possible_actions(self):
         # Velocity should be positive, <= 5
         # Compute based on self._current_velocity, self._current_pos
-        vx = self._current_velocity[0]
-        vy = self._current_velocity[1]
+        vx, vy = self._current_velocity
 
         deltas_vx = [-1, 0, 1]
         deltas_vy = [-1, 0, 1]
@@ -42,7 +41,7 @@ class Episode:
 
         # remove action that leads to (vx, vy) = (0, 0)
         possible_actions = [(delta_vx, delta_vy) for delta_vx in deltas_vx for delta_vy in deltas_vy if
-                            ((delta_vx + vx != 0) and (delta_vy + vy != 0))]
+                            ((delta_vx + vx != 0) or (delta_vy + vy != 0))]
         random.shuffle(possible_actions)
         return possible_actions
 

@@ -117,7 +117,7 @@ class RLRacetrack:
                 grid[i][j] = cmap.get(self.map_racetrack_values[base_grid[i][j]], -self.inf)
                 if grid[i][j] < 0:
                     proj_func = max if how == 'max' else sum
-                    state_values = [self.state_values[(i, j), (vx, vy)][0] for vx in
+                    state_values = [self.state_values[(j, i), (vx, vy)][0] for vx in
                                     range(self.min_speed_x, self.max_speed_x + 1)
                                     for vy in range(self.min_speed_y, self.max_speed_y + 1)]
 
@@ -130,11 +130,11 @@ class RLRacetrack:
         # Plot the convergence curve: return vs iteration
         # For smoothing purposes, we actually plot return vs 100-episode moving average of returns
         smoothing_ma_window = 100
-        moving_average = []
-        for i in range(len(self.episode_returns)):
-            moving_average.append(np.mean(self.episode_returns[max(0, i - smoothing_ma_window):i + 1]))
-
-        sns.lineplot(x=range(self.n_episodes), y=self.episode_returns). \
+        moving_average = np.convolve(np.array(self.episode_returns),
+                                     np.ones(smoothing_ma_window) / np.ones(smoothing_ma_window),
+                                     mode='valid')
+        moving_average = np.concatenate((self.episode_returns[:smoothing_ma_window - 1], moving_average))
+        sns.lineplot(x=range(self.n_episodes), y=moving_average). \
             set(xlabel='Episode', ylabel='Return', title=f'Convergence curve (MA = {smoothing_ma_window})')
         plt.show()
 
