@@ -7,12 +7,14 @@ class Racetrack:
         self.grid = None
         self.max_height = None
         self.start_positions = []
+        self.seed = 754 #  754 # other ok seeds 171#55#51 #754 47585
 
     def create_empty_grid(self, size):
         self.grid = [[0 for x in range(size[1])] for y in range(size[0])]
         # initialize an empty nxm grid
 
     def right_walk(self, x_start, min_space=5, min_width=5):
+        random.seed(self.seed)
         # set 'padding' to the max velocity
         n = len(self.grid)
         m = len(self.grid[0])
@@ -39,6 +41,7 @@ class Racetrack:
         self.max_height = y
 
     def left_walk(self, x_start, min_space=5, min_width=5):
+        random.seed(self.seed)
         n = len(self.grid)
         m = len(self.grid[0])
         y = n-1

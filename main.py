@@ -12,7 +12,7 @@ if __name__ == '__main__':
     grid_file = track.store_grid()
 
     config = {
-        'episodes': 1000,#int(1e5),
+        'episodes': 100,#int(1e5),
         'epsilon': 0.1,                                 # probability of choosing random action
         'delta': 0.1,                                   # prob to not update velocity (not take action)
         'timestep_reward': -1,                          # reward for each timestep. Actually has no impact
