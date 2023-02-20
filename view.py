@@ -84,7 +84,7 @@ class View:
     def draw_path(self, map_surf, path, n_frames):
         for i in range(n_frames-1):
             pygame.draw.line(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), (path[i+1][0][0]*self.width*3/4/self.map_height, path[i+1][0][1]*self.width*3/4/self.map_height), 3)
-            #pygame.draw.circle(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), 5)
+            pygame.draw.circle(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), 5)
 
     def update_info(self, episode):
         info_font = pygame.font.Font(None, 20)
@@ -170,16 +170,13 @@ class View:
 
             step += 1
             pygame.display.update()
-            pygame.time.delay(1)
+            pygame.time.delay(100)
             pygame.display.update()
 
         pygame.quit()
 
-
-
-
 if __name__ == '__main__':
     visualization = View()
-    visualization.load_map('runs/grid_2023_02_20h13_15_24.txt')
+    visualization.load_map('runs/grid_2023_02_20h16_55_16.txt')
     visualization.load_path('runs/policy_path.txt')
     visualization.show()
