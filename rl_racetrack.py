@@ -76,7 +76,7 @@ class RLRacetrack:
                         ((count * estimated_return + g) / (count + 1), count + 1) if count > 0 else (g, 1)
                     visited.add((pos, vel))
 
-        else:           # TODO: fix in case we want to test this other policies
+        else:  # TODO: fix in case we want to test this other policies
             for pos, vel, _ in reversed(path):
                 g += self.timestep_reward
                 if self.update_state_values_rule == 'every_visit' or \
@@ -131,10 +131,11 @@ class RLRacetrack:
         # For smoothing purposes, we actually plot return vs 100-episode moving average of returns
         smoothing_ma_window = 100
         moving_average = np.convolve(np.array(self.episode_returns),
-                                     np.ones(smoothing_ma_window) / np.ones(smoothing_ma_window),
+                                     np.ones(smoothing_ma_window) / smoothing_ma_window,
                                      mode='valid')
-        moving_average = np.concatenate((self.episode_returns[:smoothing_ma_window - 1], moving_average))
-        sns.lineplot(x=range(self.n_episodes), y=self.episode_returns). \
+        moving_average = np.concatenate((np.mean(self.episode_returns[:smoothing_ma_window - 1]) * np.ones(
+            smoothing_ma_window - 1), moving_average))
+        sns.lineplot(x=range(self.n_episodes), y=moving_average). \
             set(xlabel='Episode', ylabel='Return', title=f'Convergence curve (MA = {smoothing_ma_window})')
         plt.show()
 

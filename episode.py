@@ -63,7 +63,7 @@ class Episode:
         # Go back to the start position
         # print(f'--- Going back to start ---')
         y, x = random.choice(self.racetrack.start_positions)
-        return (x, y), (0, 0)
+        return (x, y), (0, random.choice(range(self.min_speed_y, self.max_speed_y + 1)))
 
     def simulate(self, file):
         self._current_pos, self._current_velocity = self.go_to_start()
