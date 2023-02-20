@@ -73,7 +73,7 @@ class RLRacetrack:
                 if (pos, vel) not in visited:
                     estimated_return, count = self.state_values[pos, vel]
                     self.state_values[pos, vel] = \
-                        ((estimated_return + g) / (count + 1), count + 1) if count > 0 else (g, 1)
+                        ((count * estimated_return + g) / (count + 1), count + 1) if count > 0 else (g, 1)
                     visited.add((pos, vel))
 
         else:           # TODO: fix in case we want to test this other policies
@@ -134,7 +134,7 @@ class RLRacetrack:
                                      np.ones(smoothing_ma_window) / np.ones(smoothing_ma_window),
                                      mode='valid')
         moving_average = np.concatenate((self.episode_returns[:smoothing_ma_window - 1], moving_average))
-        sns.lineplot(x=range(self.n_episodes), y=moving_average). \
+        sns.lineplot(x=range(self.n_episodes), y=self.episode_returns). \
             set(xlabel='Episode', ylabel='Return', title=f'Convergence curve (MA = {smoothing_ma_window})')
         plt.show()
 
