@@ -3,10 +3,54 @@ import random
 import pygame
 
 class View:
-    def __init__(self, racetrack: Racetrack):
-        self.map = map
+    def __init__(self):
+        self.map = None
         self.height = 800
         self.width = self.height*0.8
+        self.map_height = None
+        self.episodes = None
+
+    def load_path(self, file_path):
+        with open(file_path, 'r') as f:
+            episodes = []
+            lines = f.readlines()
+            path = []
+            for line in lines:
+                if line[0] == 'E': # New episode
+                    path = []
+                    episodes.append(path)
+                    continue
+                else:
+                    row = line.split(',')
+                    try:
+                        row.remove('\n')
+                    except:
+                        pass
+                    row = [int(x) for x in row]
+                    path.append([(row[0],row[1]),(row[2],row[3])]) #append velocity
+            episodes.append(path)
+
+            #print(len(episodes))
+            #for i in range(len(episodes)):
+            #    print(episodes[i])
+            self.episodes = episodes
+
+
+    def load_map(self, path):
+        # parse map
+        with open(path, 'r') as f:
+            map = []
+            lines = f.readlines()
+            for line in lines:
+                row = line.split(',')
+                try:
+                    row.remove('\n')
+                except:
+                    pass
+                row = [int(x) for x in row]
+                map.append(row)
+            self.map_height = len(map[0])
+            self.map = map
 
     def set_path(self, path):
         self.path = path
@@ -32,40 +76,53 @@ class View:
         map_surf.fill('black')
         return map_surf
 
-    def draw_path(self, map_surf, path, lim):
-        LENGHT = 35
-        # Draw path
-        if lim > len(path)-1:
-            lim = len(path)-1
+    def draw_path(self, map_surf, path, n_frames):
+        for i in range(n_frames-1):
+            pygame.draw.line(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), (path[i+1][0][0]*self.width*3/4/self.map_height, path[i+1][0][1]*self.width*3/4/self.map_height), 3)
+            #pygame.draw.circle(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), 5)
 
-        for i in range(lim):
-            pygame.draw.line(map_surf, 'blue', (path[i][0][0]*self.width*3/4/LENGHT, path[i][0][1]*self.width*3/4/LENGHT), (path[i+1][0][0]*self.width*3/4/LENGHT, path[i+1][0][1]*self.width*3/4/LENGHT), 3)
-            pygame.draw.circle(map_surf, 'blue', (path[i][0][0]*self.width*3/4/LENGHT, path[i][0][1]*self.width*3/4/LENGHT), 5)
+    def draw_episodes(self, map_surf, lim):
+        episode = 0
+        total_frames = len(self.episodes[episode])-1
+        frame = 0
+
+        # Draw path
+        while lim > total_frames and episode <= len(self.episodes)-2:  # lim is to create frames
+            #print('Total frames: ', total_frames)
+            episode += 1
+            total_frames += len(self.episodes[episode]) - 1
+
+        n_frames = lim - total_frames + len(self.episodes[episode]) -1
+        if n_frames > len(self.episodes[episode]):
+            n_frames = len(self.episodes[episode])
+        path = self.episodes[episode]
+
+        print('Episode: ', episode, 'Frame: ', n_frames)
+        self.draw_path(map_surf, path, n_frames)
 
 
     def draw_grid(self, map_surf):
-        LENGHT = 35
 
-        # for each value in self.map draw a rectangle
-        for key, value in self.map.items():
-            if value == 0:
-                color = 'black'
-            elif value == 1:
-                color = 'green'
-            elif value == 2:
-                color = 'grey'
-            elif value == 3:
-                color = 'red'
-            else:
-                raise ValueError('Unknown value in map')
+        for i in range(len(self.map)):
+            for j in range(len(self.map)):
+                if self.map[i][j] == 0:
+                    color = 'black'
+                elif self.map[i][j] == 1:
+                    color = 'green'
+                elif self.map[i][j] == 2:
+                    color = 'grey'
+                elif self.map[i][j] == 3:
+                    color = 'red'
+                else:
+                    raise ValueError('Unknown value in map')
 
-            pygame.draw.rect(map_surf, color, (key[0]*self.width*3/4/LENGHT, key[1]*self.width*3/4/LENGHT, self.width*3/4/LENGHT, self.width*3/4/LENGHT))
+                pygame.draw.rect(map_surf, color, (j*self.width*3/4/self.map_height, i*self.width*3/4/self.map_height, self.width*3/4/self.map_height, self.width*3/4/self.map_height))
 
-        for i in range(LENGHT):
-            vertical = (1 + i) * self.width * 3 / 4 / LENGHT
+        for i in range(len(self.map)):
+            vertical = (1 + i) * self.width * 3 / 4 / len(self.map)
             pygame.draw.line(map_surf, 'black', (vertical, 0), (vertical, self.width * 3 / 4), 1)
 
-            horizontal = (1 + i) * self.width * 3 / 4 / LENGHT
+            horizontal = (1 + i) * self.width * 3 / 4 / len(self.map)
             pygame.draw.line(map_surf, 'black', (0, horizontal), (self.width * 3 / 4, horizontal), 1)
 
 
@@ -88,54 +145,24 @@ class View:
                 if event.type == pygame.QUIT:  # Check for exit
                     run = 0  # Exit
 
+            #map_surf = self.map_background()
             screen.blit(back_surf, (0, 0))  # Add surface
             screen.blit(map_surf, (self.height/25, self.width/8))  # Add surface
             screen.blit(title, (self.height/25, self.width/25))  # Add font
 
-            pygame.time.delay(300)
-            self.draw_path(map_surf, self.path, step)
+            self.draw_grid(map_surf)
+            self.draw_episodes(map_surf, step)
 
             step += 1
-            pygame.time.delay(100)
             pygame.display.update()
-
+            pygame.time.delay(1)
+            pygame.display.update()
 
         pygame.quit()
 
 
 if __name__ == '__main__':
-
-    state1 = [(15, 35), (0, 0)]
-    state2 = [(14, 34), (1, 1)]
-    state3 = [(12, 32), (2, 2)]
-    state4 = [(10, 30), (2, 2)]
-    state5 = [(9, 27), (3, 1)]
-    state6 = [(10, 23), (4, 1)]
-    state7 = [(11, 18), (5, 1)]
-    state8 = [(11, 13), (4, 0)]
-    state9 = [(11, 8), (5, 0)]
-    state10 = [(12, 3), (5, 1)]
-
-    path = [state1, state2, state3, state4, state5, state6, state7, state8, state9, state10]
-    path2 = [state1, state10]
-
-    map = {(x, y): random.randint(0, 3) for x in range(0, 35) for y in range(0, 35)}
-
-    for x in range(0, 10):
-        for y in range(0, 35):
-            map[x, y] = 0
-        map[x, 1] = 0
-    for x in range(10, 22):
-        for y in range(0, 35):
-            map[x, y] = 2
-    for x in range(22, 35):
-        for y in range(0, 35):
-            map[x, y] = 0
-    for x in range(10, 22):
-        map[x, 34] = 1
-    for x in range(10, 22):
-        map[x, 0] = 3
-
-    view = View(map)
-    view.set_path(path)
-    view.show()
+    visualization = View()
+    visualization.load_map('runs/grid_2023_02_20h11_46_22.txt')
+    visualization.load_path('runs/policy_path.txt')
+    visualization.show()

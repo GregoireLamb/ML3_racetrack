@@ -46,17 +46,20 @@ class RLRacetrack:
 
         return state_values
 
-    def run(self):
-        print('Running episode simulations...')
+    def run(self, filename):
+        # create log file
+        # print('Running episode simulations...')
+        f = open(filename, 'w')
+
         for episode in range(self.n_episodes):
             # print progress in percents.
             if episode % (self.n_episodes // 10) == 0:
                 print(f'{episode // (self.n_episodes // 10) * 10}%')
-
+            f.write(f'Episode {episode + 1}\n')
             ep = Episode(self.racetrack, self.epsilon, self.state_values,
                          self.min_speed_x, self.max_speed_x, self.min_speed_y, self.max_speed_y, self.delta,
                          self.max_episode_length)
-            path = ep.simulate()
+            path = ep.simulate(f)
             ep_return = self.update_state_values(path)
             self.episode_returns.append(ep_return)
 
@@ -128,8 +131,9 @@ class RLRacetrack:
         # Plot path following learnt policy
         # Run the policy and print the path
         ep = Episode(self.racetrack, 0, self.state_values, self.min_speed_x, self.max_speed_x, self.min_speed_y,
-                     self.max_speed_y, self.delta, self.max_episode_length)
-        path = ep.simulate()
+                     self.max_speed_y, 0, self.max_episode_length)
+        f = open('runs\policy_path.txt', 'w')
+        path = ep.simulate(f)
 
         grid = base_grid.copy()
         cmap = {'outside': np.nan, 'start': self.inf, 'finish': self.inf, 'inside': -self.inf}

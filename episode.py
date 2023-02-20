@@ -62,21 +62,26 @@ class Episode:
 
     def go_to_start(self):
         # Go back to the start position
-        print(f'--- Going back to start ---')
+        # print(f'--- Going back to start ---')
         y, x = random.choice(self.racetrack.start_positions)
         return (x, y), (0, 0)
 
-    def simulate(self):
+    def simulate(self, file):
         self._current_pos, self._current_velocity = self.go_to_start()
         duration = 0
+        file.write(
+            f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
         while not self.racetrack.has_finished_new(self._current_pos, self._current_velocity) and \
                 duration < self.max_episode_length:
             possible_actions = self.get_possible_actions()
             self._current_pos, self._current_velocity, action = self.choose_action(possible_actions)
-            print(self._current_pos, self._current_velocity, action)
+            file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
             self._path.append((self._current_pos, self._current_velocity, action))
             if self.racetrack.check_for_crash(self._current_pos, self._current_velocity):
+                file.write(
+                    f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
                 self._current_pos, self._current_velocity = self.go_to_start()
+                file.write(
+                    f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, {self._current_velocity[1]},\n')
             duration += 1
-
         return self._path

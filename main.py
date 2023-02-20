@@ -16,17 +16,24 @@ if __name__ == '__main__':
         'min_speed_y': -5,
         'max_speed_y': 0,
         'max_episode_length': 1e3,
+        'seed': 754,                                   #  754 # other ok seeds 171#55#51 #754 47585
     }
     track = Racetrack(config)
-    track.create_grid()
+    grid_file = track.create_grid()
 
     track.print()
 
     rl_racetrack = RLRacetrack(config, track)
 
-    rl_racetrack.run()
+    logs = 'runs_'+grid_file.lstrip('grid_')
+    rl_racetrack.run('runs/'+logs)
     rl_racetrack.report()
 
-    #visualization = View(config, rl_racetrack)
+    #visualization = View()
+
+    #visualization.load_map('runs/'+grid_file)
+    #visualization.load_path('runs/'+logs)
+    #visualization.show()
+
     #visualization.show()
     #visualization.save()

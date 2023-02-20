@@ -1,14 +1,15 @@
 import random
 from utils import closed_segment_intersect
+import datetime
 
 class Racetrack:
     def __init__(self, config):
         # Values for the grid: 0 = outside, 1 = start, 2 = inside, 3 = finish
         self.shape = config['grid_shape']
-
         self.grid = None
         self.max_height = None
         self.start_positions = []
+        self.seed = config['seed']
         self.end_positions = []
         self.finish_line_endpoints = None
         self.max_x = None
@@ -16,7 +17,9 @@ class Racetrack:
     def create_grid(self):
         self.create_empty_grid()
         self.draw_grid_edges()
+        grid_file = self.store_grid()
         self.compute_finish_line_endpoints()
+        return grid_file
 
     def compute_finish_line_endpoints(self):
         max_y = max([y for x, y in self.end_positions])
@@ -29,6 +32,7 @@ class Racetrack:
         # initialize an empty nxm grid
 
     def right_walk(self, x_start, min_space=5, min_width=5):
+        random.seed(self.seed)
         # set 'padding' to the max velocity
         n = len(self.grid)
         m = len(self.grid[0])
@@ -57,6 +61,7 @@ class Racetrack:
         self.max_height = y
 
     def left_walk(self, x_start, min_space=5, min_width=5):
+        random.seed(self.seed)
         n = len(self.grid)
         m = len(self.grid[0])
         y = n - 1
@@ -174,6 +179,19 @@ class Racetrack:
         vy = velocity[1]
         return (x + vx < 0) or (x + vx >= len(self.grid)) or (y + vy < 0) or (y + vy >= len(self.grid)) or \
                 (self.grid[y + vy][x + vx] == 0)
+
+    def store_grid(self):
+        # get the current time to name the file
+        time = datetime.datetime.now()
+        filename = 'grid_'+str(time).replace('-','_').split('.', 1)[0].replace(':', '_').replace(' ', 'h')+'.txt'
+        # store the grid in a file
+        with open('runs/'+filename, 'w') as f:
+            for x in self.grid:
+                for y in x:
+                    if y != '[' or y != ']':
+                        f.write(str(y)+',')
+                f.write('\n')
+        return filename
 
     def print(self):
         values_map = {0: u"█", 1: "X", 2: " ", 3: "X"}
