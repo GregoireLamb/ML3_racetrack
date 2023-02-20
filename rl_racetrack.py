@@ -143,7 +143,7 @@ class RLRacetrack:
         ep = Episode(self.racetrack, 0, self.state_values, self.min_speed_x, self.max_speed_x, self.min_speed_y,
                      self.max_speed_y, 0, self.max_episode_length)
         f = open('runs\policy_path.txt', 'w')
-        path = ep.simulate(f)
+        path, _ = ep.simulate(f)
 
         grid = base_grid.copy()
         cmap = {'outside': np.nan, 'start': self.inf, 'finish': self.inf, 'inside': -self.inf}
