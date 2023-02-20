@@ -68,15 +68,16 @@ class RLRacetrack:
         g = 0
         visited = set()
         if self.update_state_values_rule == 'last_visit':
-            for pos, vel, action in path:
+            for pos, vel, _ in reversed(path):
                 g += self.timestep_reward
                 if (pos, vel) not in visited:
                     estimated_return, count = self.state_values[pos, vel]
-                    self.state_values[pos, vel] = (estimated_return + g) / (count + 1), count + 1
+                    self.state_values[pos, vel] = \
+                        ((estimated_return + g) / (count + 1), count + 1) if count > 0 else (g, 1)
                     visited.add((pos, vel))
 
-        else:
-            for pos, vel, action in reversed(path):
+        else:           # TODO: fix in case we want to test this other policies
+            for pos, vel, _ in reversed(path):
                 g += self.timestep_reward
                 if self.update_state_values_rule == 'every_visit' or \
                         (self.update_state_values_rule == 'first_visit' and (pos, vel) not in visited):
@@ -110,7 +111,7 @@ class RLRacetrack:
         # Use seaborn heatmap
         grid = base_grid.copy()
 
-        cmap = {'outside': np.nan, 'start': np.nan, 'finish': np.nan}
+        cmap = {'outside': np.nan}
         for i in range(len(grid)):
             for j in range(len(grid[i])):
                 grid[i][j] = cmap.get(self.map_racetrack_values[base_grid[i][j]], -self.inf)
@@ -133,7 +134,7 @@ class RLRacetrack:
         for i in range(len(self.episode_returns)):
             moving_average.append(np.mean(self.episode_returns[max(0, i - smoothing_ma_window):i + 1]))
 
-        sns.lineplot(x=range(self.n_episodes), y=moving_average). \
+        sns.lineplot(x=range(self.n_episodes), y=self.episode_returns). \
             set(xlabel='Episode', ylabel='Return', title=f'Convergence curve (MA = {smoothing_ma_window})')
         plt.show()
 
