@@ -76,13 +76,14 @@ class RLRacetrack:
                         ((count * estimated_return + g) / (count + 1), count + 1) if count > 0 else (g, 1)
                     visited.add((pos, vel))
 
-        else:  # TODO: fix in case we want to test this other policies
-            for pos, vel, _ in reversed(path):
+        else:
+            for pos, vel, _ in path:
                 g += self.timestep_reward
                 if self.update_state_values_rule == 'every_visit' or \
                         (self.update_state_values_rule == 'first_visit' and (pos, vel) not in visited):
                     estimated_return, count = self.state_values[pos, vel]
-                    self.state_values[pos, vel] = (estimated_return + g) / (count + 1), count + 1
+                    self.state_values[pos, vel] = \
+                        ((count * estimated_return + g) / (count + 1), count + 1) if count > 0 else (g, 1)
                     visited.add((pos, vel))
         return g
 
