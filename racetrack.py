@@ -128,6 +128,8 @@ class Racetrack:
         vx, vy = velocity
         x_prev = x - vx
         y_prev = y - vy
+        #if(closed_segment_intersect((x_prev, y_prev), (x, y), *self.finish_line_endpoints)):
+        #    print(" --------- TRUE ---------------------------------")
         return closed_segment_intersect((x_prev, y_prev), (x, y), *self.finish_line_endpoints)
 
     def has_finished(self, position, velocity):

@@ -29,11 +29,11 @@ if __name__ == '__main__':
     rl_racetrack.run('runs/'+logs)
     rl_racetrack.report()
 
-    #visualization = View()
+    visualization = View()
 
-    #visualization.load_map('runs/'+grid_file)
-    #visualization.load_path('runs/'+logs)
-    #visualization.show()
+    visualization.load_map('runs/'+grid_file)
+    visualization.load_path('runs/'+logs)
+    visualization.show()
 
     #visualization.show()
     #visualization.save()
