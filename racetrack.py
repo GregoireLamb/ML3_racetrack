@@ -175,6 +175,8 @@ class Racetrack:
     def jumped_over_wall(self, position, velocity):
         x1, y1 = position
         vx, vy = velocity
+        if (y1, x1) in self.start_positions:
+            return False
         x0 = x1 - vx
         y0 = y1 - vy
         for x, y in bresenham(x0, y0, x1, y1):
