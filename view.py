@@ -95,11 +95,9 @@ class View:
     def draw_episodes(self, map_surf, lim):
         episode = 0
         total_frames = len(self.episodes[episode])-1
-        frame = 0
 
         # Draw path
-        while lim > total_frames and episode <= len(self.episodes)-2:  # lim is to create frames
-            #print('Total frames: ', total_frames)
+        while lim > total_frames:  # lim is to create frames
             episode += 1
             total_frames += len(self.episodes[episode]) - 1
 
@@ -151,7 +149,8 @@ class View:
         self.draw_grid(map_surf)
 
         run = 1
-        step = 0
+        step = 50000
+
         while run:
 
             for event in pygame.event.get():  # get all event

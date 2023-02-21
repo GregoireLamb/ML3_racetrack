@@ -183,7 +183,7 @@ class Racetrack:
         x0 = x1 - vx
         y0 = y1 - vy
         for x, y in bresenham(x0, y0, x1, y1):
-            if self.grid[y][x] == 0:
+            if y < len(self.grid) and x < len(self.grid[0]) and self.grid[y][x] == 0:
                 #print("jumped_over_wall: ", x, y, self.grid[y][x])
                 return True
         return False
