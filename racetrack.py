@@ -23,6 +23,9 @@ class Racetrack:
         self.compute_finish_line_endpoints()
         return grid_file
 
+    def sort_start_line(self):
+        self.start_positions.sort(key=lambda x: x[1])
+
     def compute_finish_line_endpoints(self):
         max_y = max([y for x, y in self.end_positions])
         min_y = min([y for x, y in self.end_positions])

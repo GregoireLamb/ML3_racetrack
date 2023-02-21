@@ -5,7 +5,7 @@ import random
 
 class Episode:
     def __init__(self, racetrack: Racetrack, epsilon, state_values, min_speed_x, max_speed_x, min_speed_y, max_speed_y,
-                 delta, max_episode_length):
+                 delta, max_episode_length, random_start=True):
         self.racetrack = racetrack
         self.epsilon = epsilon
         self.state_values = state_values
@@ -15,6 +15,10 @@ class Episode:
         self.max_speed_y = max_speed_y
         self.delta = delta
         self.max_episode_length = max_episode_length
+
+        self._random_start = random_start
+        start_point = racetrack.start_positions[int(len(racetrack.start_positions) / 2)]
+        self._fixed_start = start_point[1], start_point[0]
 
         self._path = []
 
@@ -62,13 +66,21 @@ class Episode:
     def go_to_start(self):
         # Go back to the start position
         y, x = random.choice(self.racetrack.start_positions)
-        return (x, y), (0, random.choice(range(self.min_speed_y, self.max_speed_y + 1)))
+        return (x, y), self.random_velocity()
+
+    def random_velocity(self):
+        return 0, random.choice(range(self.min_speed_y, self.max_speed_y + 1))
 
     def write_to_file(self, file):
         file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, '
                    f'{self._current_velocity[0]}, {self._current_velocity[1]},\n')
 
     def simulate(self, file):
+        if self._random_start:
+            self._current_pos, self._current_velocity = self.go_to_start()
+        else:
+            self._current_pos, self._current_velocity = \
+                self._fixed_start, self.random_velocity()
         self._current_pos, self._current_velocity = self.go_to_start()
         self._path.append((self._current_pos, self._current_velocity, None))
         duration = 0
