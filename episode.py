@@ -61,29 +61,30 @@ class Episode:
 
     def go_to_start(self):
         # Go back to the start position
-        # print(f'--- Going back to start ---')
         y, x = random.choice(self.racetrack.start_positions)
         return (x, y), (0, random.choice(range(self.min_speed_y, self.max_speed_y + 1)))
+
+    def write_to_file(self, file):
+        file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, '
+                   f'{self._current_velocity[0]}, {self._current_velocity[1]},\n')
 
     def simulate(self, file):
         self._current_pos, self._current_velocity = self.go_to_start()
         self._path.append((self._current_pos, self._current_velocity, None))
         duration = 0
-        file.write(
-            f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, '
-            f'{self._current_velocity[1]},\n')
+        self.write_to_file(file)
+
         while not self.racetrack.has_finished(self._current_pos, self._current_velocity) and \
                 duration < self.max_episode_length:
             if self.racetrack.check_for_crash(self._current_pos, self._current_velocity):
                 self._current_pos, self._current_velocity = self.go_to_start()
                 self._path.append((self._current_pos, self._current_velocity, None))
-                file.write(
-                    f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, '
-                    f'{self._current_velocity[1]},\n')
+                self.write_to_file(file)
+
             possible_actions = self.get_possible_actions()
             self._current_pos, self._current_velocity, action = self.choose_action(possible_actions)
             self._path.append((self._current_pos, self._current_velocity, action))
-            file.write(f'{self._current_pos[0]}, {self._current_pos[1]}, {self._current_velocity[0]}, '
-                       f'{self._current_velocity[1]},\n')
+
+            self.write_to_file(file)
             duration += 1
         return self._path, duration < self.max_episode_length
