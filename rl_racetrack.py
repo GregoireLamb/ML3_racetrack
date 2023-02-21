@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import time
 from utils import mov_avg
 
+
 class RLRacetrack:
     def __init__(self, config: dict, racetrack: Racetrack):
         self.racetrack = racetrack
@@ -27,7 +28,7 @@ class RLRacetrack:
 
         self.map_racetrack_values = {0: 'outside', 1: 'start', 2: 'inside', 3: 'finish'}
 
-        assert self.update_state_values_rule in ['first_visit', 'every_visit', 'last_visit'], \
+        assert self.update_state_values_rule in ['first_visit', 'every_visit', 'last_visit', 'last_visit_best'], \
             'Invalid update state values rule'
         self.episode_returns = []
         self.start_time = time.time()
@@ -67,13 +68,16 @@ class RLRacetrack:
     def update_state_values(self, path: List[Tuple[Tuple[int, int], Tuple[int, int], int]]):
         g = 0
         visited = set()
-        if self.update_state_values_rule == 'last_visit':
+        if self.update_state_values_rule in ['last_visit', 'last_visit_best']:
             for pos, vel, _ in reversed(path):
                 g += self.timestep_reward
                 if (pos, vel) not in visited:
                     estimated_return, count = self.state_values[pos, vel]
-                    self.state_values[pos, vel] = \
-                        ((count * estimated_return + g) / (count + 1), count + 1) if count > 0 else (g, 1)
+                    if self.update_state_values_rule == 'last_visit_best':
+                        self.state_values[pos, vel] = (max(estimated_return, g), count + 1)
+                    else:
+                        self.state_values[pos, vel] = \
+                            ((count * estimated_return + g) / (count + 1), count + 1) if count > 0 else (g, 1)
                     visited.add((pos, vel))
 
         else:
@@ -141,7 +145,7 @@ class RLRacetrack:
         # Run the policy and print the path
         ep = Episode(self.racetrack, 0, self.state_values, self.min_speed_x, self.max_speed_x, self.min_speed_y,
                      self.max_speed_y, 0, self.max_episode_length)
-        f = open('runs\policy_path.txt', 'w')
+        f = open(r'runs\policy_path.txt', 'w')
         path, _ = ep.simulate(f)
 
         grid = base_grid.copy()

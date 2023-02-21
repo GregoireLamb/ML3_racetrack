@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import yaml, time
+import yaml
+import time
 
 from rl_racetrack import RLRacetrack
 from utils import mov_avg
@@ -69,9 +70,8 @@ class MultipleRL:
 
         df = pd.DataFrame(self._results)
         df['episode'] = df.index
-        sns.lineplot(data=df.melt(id_vars='episode', var_name='settings'), x='episode', y='value',
-                     hue='settings').set(title=f'Episode returns by execution (MA = {mov_avg_window})', xlabel='Episode',
-                                         ylabel='Episode return')
+        sns.lineplot(data=df.melt(id_vars='episode', var_name='settings'), x='episode', y='value', hue='settings').set(
+            title=f'Episode returns by execution (MA = {mov_avg_window})', xlabel='Episode', ylabel='Episode return')
         plt.show()
 
     @staticmethod
@@ -93,11 +93,9 @@ class MultipleRL:
 
 
 if __name__ == '__main__':
-    config = yaml.load(open('config.yaml', 'r'), Loader=yaml.FullLoader)
-
-    params_to_try = {
-        'epsilon': [0.05, 0.1, 0.2, 0.3],
+    to_try = {
+        'update_state_values_rule': ['last_visit', 'last_visit_best'],
     }
 
-    multipleRL = MultipleRL(params_to_try, how='cross')
+    multipleRL = MultipleRL(to_try, how='cross')
     multipleRL.run()
