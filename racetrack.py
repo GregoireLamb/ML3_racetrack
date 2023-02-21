@@ -30,7 +30,7 @@ class Racetrack:
         self.finish_line_endpoints = (x, min_y), (x, max_y)
 
     def create_empty_grid(self):
-        self.grid = [[0 for x in range(self.shape[1])] for y in range(self.shape[0])]
+        self.grid = [[0 for _ in range(self.shape[1])] for _ in range(self.shape[0])]
         # initialize an empty nxm grid
 
     def right_walk(self, x_start, min_space=5, min_width=5):
@@ -66,7 +66,6 @@ class Racetrack:
         random.seed(self.seed)
         n = len(self.grid)
         m = len(self.grid[0])
-        y = n - 1
         x = x_start
         self.grid[n - 2][x] = 2
         self.grid[n - 3][x] = 2
@@ -121,7 +120,7 @@ class Racetrack:
             self.fill_grid(y, x + 1)
             self.fill_grid(y - 1, x)
 
-    def has_finished_new(self, position, velocity):
+    def has_finished(self, position, velocity):
         # Compute whether the segments:
         # 1. previous position to current position, and
         # 2. finish line; are intersecting
@@ -130,11 +129,9 @@ class Racetrack:
         vx, vy = velocity
         x_prev = x - vx
         y_prev = y - vy
-        #if(closed_segment_intersect((x_prev, y_prev), (x, y), *self.finish_line_endpoints)):
-        #    print(" --------- TRUE ---------------------------------")
         return closed_segment_intersect((x_prev, y_prev), (x, y), *self.finish_line_endpoints)
 
-    def has_finished(self, position, velocity):
+    def has_finished_old(self, position, velocity):
         # check if the car has reached the finish line
         x, y = position
         vx, vy = velocity
@@ -178,6 +175,8 @@ class Racetrack:
     def jumped_over_wall(self, position, velocity):
         x1, y1 = position
         vx, vy = velocity
+        if (y1, x1) in self.start_positions:
+            return False
         x0 = x1 - vx
         y0 = y1 - vy
         for x, y in bresenham(x0, y0, x1, y1):
@@ -189,17 +188,12 @@ class Racetrack:
     def check_for_crash(self, position, velocity):
         # check if the car will crash
         x, y = position
-        vx, vy = velocity
-        if self.grid[y][x] == 0: # Simple crash
-            return True
-        elif self.jumped_over_wall(position, velocity):
-            return True
-        return False
+        return self.grid[y][x] == 0 or self.jumped_over_wall(position, velocity)
 
     def store_grid(self):
         # get the current time to name the file
         time = datetime.datetime.now()
-        filename = 'grid_'+str(time).replace('-','_').split('.', 1)[0].replace(':', '_').replace(' ', 'h')+'.txt'
+        filename = 'grid_'+str(time).replace('-', '_').split('.', 1)[0].replace(':', '_').replace(' ', 'h')+'.txt'
         # store the grid in a file
         with open('runs/'+filename, 'w') as f:
             for x in self.grid:
