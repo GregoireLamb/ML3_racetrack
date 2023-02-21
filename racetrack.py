@@ -1,6 +1,8 @@
 import random
 from utils import closed_segment_intersect
 import datetime
+from bresenham import bresenham
+
 
 class Racetrack:
     def __init__(self, config):
@@ -173,11 +175,26 @@ class Racetrack:
         else:
             return False
 
+    def jumped_over_wall(self, position, velocity):
+        x1, y1 = position
+        vx, vy = velocity
+        x0 = x1 - vx
+        y0 = y1 - vy
+        for x, y in bresenham(x0, y0, x1, y1):
+            if self.grid[y][x] == 0:
+                #print("jumped_over_wall: ", x, y, self.grid[y][x])
+                return True
+        return False
+
     def check_for_crash(self, position, velocity):
         # check if the car will crash
         x, y = position
         vx, vy = velocity
-        return self.grid[y][x] == 0
+        if self.grid[y][x] == 0: # Simple crash
+            return True
+        elif self.jumped_over_wall(position, velocity):
+            return True
+        return False
 
     def store_grid(self):
         # get the current time to name the file
@@ -197,3 +214,15 @@ class Racetrack:
         for i in range(len(self.grid)):
             print(''.join([values_map[self.grid[i][j]] for j in range(len(self.grid[i]))]))
 
+
+#
+#       Test function to delete in the final version
+#
+
+    def test_crash(self):
+        for x, y in bresenham(0, 0, 2, 1):
+            print(x, y)
+
+        position = (15, 15)
+        velocity = (2, 2)
+        #print(self.check_for_crash(self, position, velocity))
