@@ -146,6 +146,7 @@ class RLRacetrack:
         ep = Episode(self.racetrack, 0, self.state_values, self.min_speed_x, self.max_speed_x, self.min_speed_y,
                      self.max_speed_y, 0, self.max_episode_length, random_start=False)
         f = open(r'runs\policy_path.txt', 'w')
+        f.write('Episode 0:\n')
         path, _ = ep.simulate(f)
 
         grid = base_grid.copy()
