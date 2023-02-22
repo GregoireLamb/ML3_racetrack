@@ -2,9 +2,9 @@
 In this project, we solve the problem of finding the optimal (fastest) trajectory in a curve. We use a Monte-Carlo approach for optimizing the RL formulation of the problem. We want to maximize the max expected return, which is defined as (minus) the length of the path from current position to the endline.
 
 ### Authors
-[Gregoire de Lambertye](https://github.com/GregoireLamb)
-[Joan Salvà](https://github.com/jsalva9)
-[Max Orteu](https://github.com/Morteu)
+- [Gregoire de Lambertye](https://github.com/GregoireLamb)
+- [Joan Salvà](https://github.com/jsalva9)
+- [Max Orteu](https://github.com/Morteu)
 
 ### Classes and modules
 ![image](https://user-images.githubusercontent.com/38510928/220766756-f98305dd-5d92-488e-82ae-28129565803c.png)
