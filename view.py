@@ -128,7 +128,7 @@ class View:
 
 
 
-    def show(self, n_episodes_to_show = 10, speed = 10):
+    def show(self, n_episodes_to_show = 10, speed = 1):
         pygame.init()
         clock = pygame.time.Clock()
         ep = 0
@@ -179,6 +179,6 @@ class View:
 
 if __name__ == '__main__':
     visualization = View()
-    visualization.load_map('runs/grid_2023_02_22h21_32_50.txt')
-    visualization.load_path('runs/policy_path.txt')
+    visualization.load_map('runs/grid_2023_02_22h21_32_50.csv')
+    visualization.load_path('runs/policy_path.csv')
     visualization.show(n_episodes_to_show=0)

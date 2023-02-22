@@ -23,7 +23,6 @@ if __name__ == '__main__':
 
     visualization.load_map('runs/'+grid_file)
     visualization.load_path('runs/'+logs)
+
     visualization.show()
 
-    # visualization.show()
-    # visualization.save()

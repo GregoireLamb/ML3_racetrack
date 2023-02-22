@@ -196,7 +196,7 @@ class Racetrack:
     def store_grid(self):
         # get the current time to name the file
         time = datetime.datetime.now()
-        filename = 'grid_'+str(time).replace('-', '_').split('.', 1)[0].replace(':', '_').replace(' ', 'h')+'.txt'
+        filename = 'grid_'+str(time).replace('-', '_').split('.', 1)[0].replace(':', '_').replace(' ', 'h')+'.csv'
         # store the grid in a file
         with open('runs/'+filename, 'w') as f:
             for x in self.grid:
