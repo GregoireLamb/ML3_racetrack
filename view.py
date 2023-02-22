@@ -9,31 +9,20 @@ class View:
         self.width = self.height*0.8
         self.map_height = None
         self.episodes = None
+        self.n_episodes = []
+        self.file_path = None
 
     def load_path(self, file_path):
+        self.file_path = file_path
         with open(file_path, 'r') as f:
-            episodes = []
+            self.n_episodes = []
             lines = f.readlines()
-            path = []
+            count = 0
             for line in lines:
                 if line[0] == 'E': # New episode
-                    path = []
-                    episodes.append(path)
-                    continue
-                else:
-                    row = line.split(',')
-                    try:
-                        row.remove('\n')
-                    except:
-                        pass
-                    row = [int(x) for x in row]
-                    path.append([(row[0],row[1]),(row[2],row[3])]) #append velocity
-            episodes.append(path)
-
-            #print(len(episodes))
-            #for i in range(len(episodes)):
-            #    print(episodes[i])
-            self.episodes = episodes
+                    self.n_episodes.append(count)
+                count += 1
+            self.n_episodes.append(len(lines))
 
 
     def load_map(self, path):
@@ -82,9 +71,9 @@ class View:
         return map_surf
 
     def draw_path(self, map_surf, path, n_frames):
-        for i in range(n_frames-1):
-            pygame.draw.line(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), (path[i+1][0][0]*self.width*3/4/self.map_height, path[i+1][0][1]*self.width*3/4/self.map_height), 3)
-            pygame.draw.circle(map_surf, 'blue', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), 5)
+        for i in range(n_frames):
+            pygame.draw.line(map_surf, '#03396c', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), (path[i+1][0][0]*self.width*3/4/self.map_height, path[i+1][0][1]*self.width*3/4/self.map_height), 3)
+            pygame.draw.circle(map_surf, '#03396c', (path[i][0][0]*self.width*3/4/self.map_height, path[i][0][1]*self.width*3/4/self.map_height), 4)
 
     def update_info(self, episode):
         info_font = pygame.font.Font(None, 20)
@@ -92,37 +81,39 @@ class View:
         info_surf = info_font.render(text, True, 'Black')
         return info_surf
 
-    def draw_episodes(self, map_surf, lim):
-        episode = 0
-        total_frames = len(self.episodes[episode])-1
+    def draw_episodes(self, map_surf, ep, lim):
+        path = []
+        with open(self.file_path, 'r') as f:
+            lines = f.readlines()
+            for line in lines[self.n_episodes[ep]:self.n_episodes[ep+1]]:
+                if line[0] == 'E':
+                    continue
+                else:
+                    row = line.split(',')
+                    try:
+                        row.remove('\n')
+                    except:
+                        pass
+                    row = [int(x) for x in row]
+                    path.append([(row[0], row[1]), (row[2], row[3])])
 
-        # Draw path
-        while lim > total_frames:  # lim is to create frames
-            episode += 1
-            total_frames += len(self.episodes[episode]) - 1
+        n_frame = min(len(path)-1, lim)
 
-        n_frames = lim - total_frames + len(self.episodes[episode]) -1
-        if n_frames > len(self.episodes[episode]):
-            n_frames = len(self.episodes[episode])
-        path = self.episodes[episode]
-
-        print('Episode: ', episode, 'Frame: ', n_frames)
-        self.draw_path(map_surf, path, n_frames)
-        return episode
+        self.draw_path(map_surf, path, n_frame)
+        return self.n_episodes[ep+1] - self.n_episodes[ep]
 
 
     def draw_grid(self, map_surf):
-
         for i in range(len(self.map)):
             for j in range(len(self.map)):
                 if self.map[i][j] == 0:
                     color = 'black'
                 elif self.map[i][j] == 1:
-                    color = 'green'
+                    color = '#7bc043'
                 elif self.map[i][j] == 2:
-                    color = 'grey'
+                    color = '#f4f4f8'
                 elif self.map[i][j] == 3:
-                    color = 'red'
+                    color = '#fe4a49'
                 else:
                     raise ValueError('Unknown value in map')
 
@@ -137,9 +128,12 @@ class View:
 
 
 
-    def show(self):
+    def show(self, n_episodes_to_show = 10, speed = 10):
         pygame.init()
         clock = pygame.time.Clock()
+        ep = 0
+        ep_length = 2
+        n_ep_show = n_episodes_to_show
 
         screen = self.create_screen()
         back_surf = self.create_background()
@@ -149,8 +143,9 @@ class View:
         self.draw_grid(map_surf)
 
         run = 1
-        step = 50000
+        step = 0
 
+        print('Episode: ', ep)
         while run:
 
             for event in pygame.event.get():  # get all event
@@ -163,19 +158,27 @@ class View:
             screen.blit(title, (self.height/25, self.width/25))  # Add font
             screen.blit(info_surf, (self.height/1.5, self.width/5))  # Add surface
 
+            if n_ep_show != 0 and step >= ep_length:
+                ep += int((len(self.n_episodes)-1)/n_episodes_to_show)
+                if ep == len(self.n_episodes)-1:
+                    ep = len(self.n_episodes)-2
+                step = 0
+                n_ep_show -= 1
+                print('Episode: ', ep)
+
             self.draw_grid(map_surf)
-            episode = self.draw_episodes(map_surf, step)
-            info_surf = self.update_info(episode)
+            ep_length = self.draw_episodes(map_surf, ep, step)
+            info_surf = self.update_info(ep)
 
             step += 1
             pygame.display.update()
-            pygame.time.delay(100)
+            pygame.time.delay(speed)
             pygame.display.update()
 
         pygame.quit()
 
 if __name__ == '__main__':
     visualization = View()
-    visualization.load_map('runs/grid_2023_02_20h16_55_16.txt')
+    visualization.load_map('runs/grid_2023_02_22h21_32_50.txt')
     visualization.load_path('runs/policy_path.txt')
-    visualization.show()
+    visualization.show(n_episodes_to_show=0)

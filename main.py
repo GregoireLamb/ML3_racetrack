@@ -11,7 +11,7 @@ if __name__ == '__main__':
     grid_file = track.create_grid()
 
     #track.test_crash()
-    track.print()
+    #track.print()
 
     rl_racetrack = RLRacetrack(config, track)
 
